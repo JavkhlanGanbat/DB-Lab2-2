@@ -1,0 +1,129 @@
+-- Query 1
+SELECT p.ProductID, p.ProductName, p.ProductDescription, p.Total,  
+       o.OrderID, o.OrderDate, o.Total AS OrderTotal,
+       u.UserID, u.Username, u.Email, 
+       pm.PaymentType, pm.Company, pm.CardNumber
+FROM Product p
+JOIN OrderItems oi ON p.ProductID = oi.ProductCopyID
+JOIN `Order` o ON oi.OrderID = o.OrderID
+JOIN User u ON o.UserID = u.UserID
+JOIN PaymentMethod pm ON o.PaymentID = pm.PaymentID
+WHERE o.Status = 'Completed'
+GROUP BY p.ProductID, o.OrderID, u.UserID, pm.PaymentID
+ORDER BY COUNT(oi.OrderItemsID) DESC, o.OrderDate DESC
+LIMIT 5;
+
+-- Query 2
+SELECT p.ProductID, p.ProductName, p.ProductDescription,
+       COUNT(c.CommentID) AS TotalComments,
+       AVG(c.Rating) AS AvgRating,
+       MAX(c.PublishDate) AS LastCommentDate
+FROM Product p
+LEFT JOIN Comment c ON p.ProductID = c.ProductID
+GROUP BY p.ProductID
+ORDER BY AvgRating DESC, TotalComments DESC, LastCommentDate DESC;
+
+-- Query 3
+SELECT u.UserID, u.Username, u.Email,
+       SUM(o.Total) AS TotalSpent,
+       pm.PaymentType AS MostUsedPaymentType,
+       MAX(o.OrderDate) AS LastOrderDate
+FROM User u
+JOIN `Order` o ON u.UserID = o.UserID
+JOIN PaymentMethod pm ON o.PaymentID = pm.PaymentID
+GROUP BY u.UserID, pm.PaymentType
+HAVING COUNT(pm.PaymentType) = (
+    SELECT MAX(count_pm.PaymentTypeCount)
+    FROM (
+        SELECT pm.PaymentType, COUNT(pm.PaymentType) AS PaymentTypeCount
+        FROM PaymentMethod pm
+        GROUP BY pm.PaymentType
+    ) AS count_pm
+)
+ORDER BY TotalSpent DESC, LastOrderDate DESC;
+
+-- Query 4
+SELECT p.ProductID, p.ProductName, c.CountryName,
+       COUNT(DISTINCT u.UserID) AS UsersInCountry,
+       SUM(oi.Quantity) AS TotalPurchasedQuantity
+FROM Product p
+JOIN ProductCopy pc ON p.ProductID = pc.ProductID
+JOIN OrderItems oi ON pc.ProductCopyID = oi.ProductCopyID
+JOIN `Order` o ON oi.OrderID = o.OrderID
+JOIN User u ON o.UserID = u.UserID
+JOIN UserAddress ua ON u.UserID = ua.UserID
+JOIN Address a ON ua.AddressID = a.AddressID
+JOIN Country c ON a.CountryID = c.CountryID
+GROUP BY p.ProductID, c.CountryName
+ORDER BY p.ProductName, c.CountryName;
+
+-- Query 5
+SELECT sc.CartID, sc.UserID, u.Username, sc.CreationDate,
+       COUNT(ci.CartItemID) AS TotalItems,
+       SUM(ci.Quantity) AS TotalQuantity,
+       MAX(ci.DateAdded) AS LatestItemAddedDate
+FROM ShoppingCart sc
+JOIN CartItem ci ON sc.CartID = ci.CartID
+JOIN User u ON sc.UserID = u.UserID
+WHERE sc.CreationDate >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+GROUP BY sc.CartID
+ORDER BY TotalQuantity DESC, LatestItemAddedDate DESC;
+
+-- Query 6
+SELECT pc.CategoryType, p.ProductID, p.ProductName, p.AvgRating AS MaxRating,
+       o.OwnerID, o.OwnerName,
+       COALESCE(SUM(oi.Quantity), 0) AS TotalQuantitySold
+FROM ProductCategory pc
+JOIN Product p ON pc.ProductCategoryID = p.ProductCategoryID
+JOIN Owner o ON p.OwnerID = o.OwnerID
+LEFT JOIN OrderItems oi ON p.ProductID = oi.ProductCopyID
+WHERE p.AvgRating = (
+    SELECT MAX(sub_p.AvgRating)
+    FROM Product sub_p
+    WHERE sub_p.ProductCategoryID = pc.ProductCategoryID
+)
+GROUP BY pc.CategoryType, p.ProductID, p.ProductName, p.AvgRating, o.OwnerID, o.OwnerName
+ORDER BY pc.CategoryType, p.AvgRating DESC;
+
+-- Query 7
+SELECT u.UserID, u.Username, u.Email, 
+       COUNT(DISTINCT oi.ProductCopyID) AS DistinctProductsPurchased,
+       SUM(oi.Quantity) AS TotalQuantity,
+       COUNT(DISTINCT o.OrderID) AS TotalOrders
+FROM User u
+JOIN `Order` o ON u.UserID = o.UserID
+JOIN OrderItems oi ON o.OrderID = oi.OrderID
+GROUP BY u.UserID
+ORDER BY DistinctProductsPurchased DESC, TotalQuantity DESC;
+
+-- Query 8
+SELECT o.OrderID, u.UserID, u.Username, 
+       oi.ProductCopyID, pc.Price AS UnitPrice, oi.Quantity,
+       (oi.Quantity * pc.Price) AS TotalItemPrice,
+       SUM(oi.Quantity * pc.Price) OVER (PARTITION BY o.OrderID) AS OrderTotal
+FROM `Order` o
+JOIN OrderItems oi ON o.OrderID = oi.OrderID
+JOIN ProductCopy pc ON oi.ProductCopyID = pc.ProductCopyID
+JOIN User u ON o.UserID = u.UserID
+ORDER BY o.OrderDate DESC, o.OrderID;
+
+-- Query 9
+SELECT u.UserID, u.Username, u.Email,
+       COUNT(c.CommentID) AS TotalComments,
+       AVG(c.Rating) AS AvgRatingGiven,
+       COUNT(DISTINCT c.ProductID) AS TotalProductsReviewed,
+       lc.LastComment AS LastComment,
+       lc.LastCommentDate AS LastCommentDate
+FROM User u
+LEFT JOIN Comment c ON u.UserID = c.UserID
+LEFT JOIN (
+    SELECT UserID, Comment AS LastComment, PublishDate AS LastCommentDate
+    FROM Comment
+    WHERE (UserID, PublishDate) IN (
+        SELECT UserID, MAX(PublishDate) AS LastCommentDate
+        FROM Comment
+        GROUP BY UserID
+    )
+) AS lc ON u.UserID = lc.UserID
+GROUP BY u.UserID, u.Username, u.Email, lc.LastComment, lc.LastCommentDate
+ORDER BY TotalComments DESC, LastCommentDate DESC, AvgRatingGiven DESC;

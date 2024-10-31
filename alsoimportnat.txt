@@ -1,0 +1,162 @@
+CREATE TABLE IF NOT EXISTS ProductCategory (
+            ProductCategoryID INT PRIMARY KEY,
+            CategoryType VARCHAR(255)
+        );
+
+		CREATE TABLE Owner (
+			OwnerID INT PRIMARY KEY,
+			OwnerName VARCHAR(255),
+			ProductID INT  -- this should be present to avoid the "Unknown column" error
+);
+
+        CREATE TABLE IF NOT EXISTS Product (
+            ProductID INT PRIMARY KEY,
+            ProductName VARCHAR(255),
+            ProductDescription VARCHAR(255),
+            Total INT,
+            Stock INT,
+            ProductCategoryID INT,
+            OwnerID INT,
+            ListedDate DATE,
+            AvgRating FLOAT
+        );
+
+        CREATE TABLE IF NOT EXISTS ProductCopy (
+            ProductCopyID INT PRIMARY KEY,
+            ProductID INT,
+            Price FLOAT
+        );
+
+        CREATE TABLE IF NOT EXISTS User (
+            UserID INT PRIMARY KEY,
+            Username VARCHAR(255),
+            Email VARCHAR(255),
+            Password VARCHAR(255),
+            DateJoined DATE,
+            Role VARCHAR(255)
+        );
+
+        CREATE TABLE IF NOT EXISTS Comment (
+            CommentID INT PRIMARY KEY,
+            Comment TEXT,
+            ProductID INT,
+            UserID INT,
+            PublishDate DATE,
+            Rating FLOAT
+        );
+
+        CREATE TABLE IF NOT EXISTS ShoppingCart (
+            CartID INT PRIMARY KEY,
+            UserID INT,
+            CreationDate DATE
+        );
+
+        CREATE TABLE IF NOT EXISTS CartItem (
+            CartItemID INT PRIMARY KEY,
+            CartID INT,
+            DateAdded TIMESTAMP,
+            Quantity INT,
+            ProductCopyID INT
+        );
+
+        CREATE TABLE IF NOT EXISTS `Order` (
+            OrderID INT PRIMARY KEY,
+            UserID INT,
+            Total FLOAT,
+            Status VARCHAR(255),
+            PaymentID INT,
+            OrderDate DATE,
+            AddressID INT
+        );
+
+        CREATE TABLE IF NOT EXISTS OrderItems (
+            OrderItemsID INT PRIMARY KEY,
+            ProductCopyID INT,
+            OrderID INT,
+            Quantity INT
+        );
+
+        CREATE TABLE IF NOT EXISTS PaymentMethod (
+            PaymentID INT PRIMARY KEY,
+            UserID INT,
+            PaymentType VARCHAR(255),
+            Company VARCHAR(255),
+            CardNumber BIGINT,
+            ExpDate DATE,
+            IsMain BOOLEAN
+        );
+
+        CREATE TABLE IF NOT EXISTS Address (
+            AddressID INT PRIMARY KEY,
+            Street VARCHAR(255),
+            AddressLine VARCHAR(255),
+            City VARCHAR(255),
+            CountryID INT
+        );
+
+        CREATE TABLE IF NOT EXISTS UserAddress (
+            UserID INT,
+            AddressID INT,
+            PRIMARY KEY (UserID, AddressID)
+        );
+
+        CREATE TABLE IF NOT EXISTS Country (
+            CountryID INT PRIMARY KEY,
+            CountryName VARCHAR(255));
+           
+-- Constraints --
+
+ALTER TABLE Product
+        ADD CONSTRAINT FK_ProductCategory
+        FOREIGN KEY (ProductCategoryID) REFERENCES ProductCategory(ProductCategoryID),
+        ADD CONSTRAINT FK_Owner
+        FOREIGN KEY (OwnerID) REFERENCES Owner(OwnerID);
+
+        ALTER TABLE ProductCopy
+        ADD CONSTRAINT FK_ProductCopy_Product
+        FOREIGN KEY (ProductID) REFERENCES Product(ProductID);
+
+        ALTER TABLE Comment
+        ADD CONSTRAINT FK_Comment_Product
+        FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
+        ADD CONSTRAINT FK_Comment_User
+        FOREIGN KEY (UserID) REFERENCES User(UserID);
+
+        ALTER TABLE ShoppingCart
+        ADD CONSTRAINT FK_ShoppingCart_User
+        FOREIGN KEY (UserID) REFERENCES User(UserID);
+
+        ALTER TABLE CartItem
+        ADD CONSTRAINT FK_CartItem_Cart
+        FOREIGN KEY (CartID) REFERENCES ShoppingCart(CartID),
+        ADD CONSTRAINT FK_CartItem_ProductCopy
+        FOREIGN KEY (ProductCopyID) REFERENCES ProductCopy(ProductCopyID);
+
+        ALTER TABLE `Order`
+        ADD CONSTRAINT FK_Order_User
+        FOREIGN KEY (UserID) REFERENCES User(UserID),
+        ADD CONSTRAINT FK_Order_Payment
+        FOREIGN KEY (PaymentID) REFERENCES PaymentMethod(PaymentID),
+        ADD CONSTRAINT FK_Order_Address
+        FOREIGN KEY (AddressID) REFERENCES Address(AddressID);
+
+        ALTER TABLE OrderItems
+        ADD CONSTRAINT FK_OrderItems_ProductCopy
+        FOREIGN KEY (ProductCopyID) REFERENCES ProductCopy(ProductCopyID),
+        ADD CONSTRAINT FK_OrderItems_Order
+        FOREIGN KEY (OrderID) REFERENCES `Order`(OrderID);
+
+        ALTER TABLE PaymentMethod
+        ADD CONSTRAINT FK_PaymentMethod_User
+        FOREIGN KEY (UserID) REFERENCES User(UserID);
+
+        ALTER TABLE Address
+        ADD CONSTRAINT FK_Address_Country
+        FOREIGN KEY (CountryID) REFERENCES Country(CountryID);
+
+        ALTER TABLE UserAddress
+        ADD CONSTRAINT FK_UserAddress_User
+        FOREIGN KEY (UserID) REFERENCES User(UserID),
+        ADD CONSTRAINT FK_UserAddress_Address
+        FOREIGN KEY (AddressID) REFERENCES Address(AddressID);
+        
