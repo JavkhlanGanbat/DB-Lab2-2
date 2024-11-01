@@ -16,4 +16,22 @@ CREATE INDEX idx_product_owner_id ON Product (OwnerID);
 CREATE INDEX idx_product_category_id ON Product (ProductCategoryID);
 CREATE INDEX idx_product_avg_rating ON Product (AvgRating);
 
-create database labdatabase
+-- Index deletion --
+
+DROP INDEX idx_order_user_id ON `Order`;
+DROP INDEX idx_order_payment_id ON `Order`;
+DROP INDEX idx_order_items_order_id ON OrderItems;
+DROP INDEX idx_order_items_product_copy_id ON OrderItems;
+DROP INDEX idx_payment_method_payment_id ON PaymentMethod;
+DROP INDEX idx_comment_product_id ON Comment;
+DROP INDEX idx_user_address_user_id ON UserAddress;
+DROP INDEX idx_address_country_id ON Address;
+DROP INDEX idx_country_country_id ON Country;
+
+DROP INDEX idx_order_status ON `Order`;
+
+DROP INDEX idx_order_items_product_copy_order ON OrderItems;
+DROP INDEX idx_comment_user_product ON Comment;
+DROP INDEX idx_product_owner_id ON Product;
+DROP INDEX idx_product_category_id ON Product;
+DROP INDEX idx_product_avg_rating ON Product;
