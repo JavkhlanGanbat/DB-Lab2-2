@@ -64,25 +64,20 @@ def execute_query(query):
 
 # Example query
 query = """
-SELECT u.UserID, u.Username, u.Email,
-       COUNT(c.CommentID) AS TotalComments,
-       AVG(c.Rating) AS AvgRatingGiven,
-       COUNT(DISTINCT c.ProductID) AS TotalProductsReviewed,
-       lc.LastComment AS LastComment,
-       lc.LastCommentDate AS LastCommentDate
-FROM User u
-LEFT JOIN Comment c ON u.UserID = c.UserID
-LEFT JOIN (
-    SELECT UserID, Comment AS LastComment, PublishDate AS LastCommentDate
-    FROM Comment
-    WHERE (UserID, PublishDate) IN (
-        SELECT UserID, MAX(PublishDate) AS LastCommentDate
-        FROM Comment
-        GROUP BY UserID
-    )
-) AS lc ON u.UserID = lc.UserID
-GROUP BY u.UserID, u.Username, u.Email, lc.LastComment, lc.LastCommentDate
-ORDER BY TotalComments DESC, LastCommentDate DESC, AvgRatingGiven DESC;
+SELECT pc.CategoryType, p.ProductID, p.ProductName, p.AvgRating AS MaxRating,
+       o.OwnerID, o.OwnerName,
+       COALESCE(SUM(oi.Quantity), 0) AS TotalQuantitySold
+FROM ProductCategory pc
+JOIN Product p ON pc.ProductCategoryID = p.ProductCategoryID
+JOIN Owner o ON p.OwnerID = o.OwnerID
+LEFT JOIN OrderItems oi ON p.ProductID = oi.ProductCopyID
+WHERE p.AvgRating = (
+    SELECT MAX(sub_p.AvgRating)
+    FROM Product sub_p
+    WHERE sub_p.ProductCategoryID = pc.ProductCategoryID
+)
+GROUP BY pc.CategoryType, p.ProductID, p.ProductName, p.AvgRating, o.OwnerID, o.OwnerName
+ORDER BY pc.CategoryType, p.AvgRating DESC;
 """
 
 execute_query(query)

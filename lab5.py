@@ -44,11 +44,31 @@ def insert_data(connection):
         ("OrderItems", "INSERT INTO OrderItems (OrderItemsID, ProductCopyID, OrderID, Quantity) VALUES (%s, %s, %s, %s)"),
         ("Comment", "INSERT INTO Comment (CommentID, Comment, ProductID, UserID, PublishDate, Rating) VALUES (%s, %s, %s, %s, %s, %s)"),
     ]
+def insert_data(connection):
+    cursor = connection.cursor()
+    tables = [
+        ("Country", "INSERT INTO Country (CountryID, CountryName) VALUES (%s, %s)"),
+        ("ProductCategory", "INSERT INTO ProductCategory (ProductCategoryID, CategoryType) VALUES (%s, %s)"),
+        ("User", "INSERT INTO User (UserID, Username, Email, Password, DateJoined, Role) VALUES (%s, %s, %s, %s, %s, %s)"),
+        ("Owner", "INSERT INTO Owner (OwnerID, OwnerName, ProductID) VALUES (%s, %s, %s)"),
+        ("Product", "INSERT INTO Product (ProductID, ProductName, ProductDescription, Total, Stock, ProductCategoryID, OwnerID, ListedDate, AvgRating) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"),
+        ("ProductCopy", "INSERT INTO ProductCopy (ProductCopyID, ProductID, Price) VALUES (%s, %s, %s)"),
+        ("Address", "INSERT INTO Address (AddressID, Street, AddressLine, City, CountryID) VALUES (%s, %s, %s, %s, %s)"),
+        ("UserAddress", "INSERT INTO UserAddress (UserID, AddressID) VALUES (%s, %s)"),
+        ("ShoppingCart", "INSERT INTO ShoppingCart (CartID, UserID, CreationDate) VALUES (%s, %s, %s)"),
+        ("CartItem", "INSERT INTO CartItem (CartItemID, CartID, DateAdded, Quantity, ProductCopyID) VALUES (%s, %s, %s, %s, %s)"),
+        ("PaymentMethod", "INSERT INTO PaymentMethod (PaymentID, UserID, PaymentType, Company, CardNumber, ExpDate, IsMain) VALUES (%s, %s, %s, %s, %s, %s, %s)"),
+        ("Order", "INSERT INTO `Order` (OrderID, UserID, Total, Status, PaymentID, OrderDate, AddressID) VALUES (%s, %s, %s, %s, %s, %s, %s)"),
+        ("OrderItems", "INSERT INTO OrderItems (OrderItemsID, ProductCopyID, OrderID, Quantity) VALUES (%s, %s, %s, %s)"),
+        ("Comment", "INSERT INTO Comment (CommentID, Comment, ProductID, UserID, PublishDate, Rating) VALUES (%s, %s, %s, %s, %s, %s)"),
+    ]
+
+    existing_user_addresses = set()  # To track existing (UserID, AddressID) pairs
 
     for table, query in tables:
         num_rows = int(input(f"Enter the number of rows to insert into {table}: "))
         for i in range(num_rows):
-            # Dummy data generation for each table
+            # Dummy data generation for each table (same as before)
             if table == "Country":
                 data = (i + 1, f"Country_{i + 1}")
 
@@ -80,6 +100,11 @@ def insert_data(connection):
             elif table == "UserAddress":
                 user_id = random.randint(1, num_rows)
                 address_id = random.randint(1, num_rows)
+                # Check for uniqueness
+                while (user_id, address_id) in existing_user_addresses:
+                    user_id = random.randint(1, num_rows)
+                    address_id = random.randint(1, num_rows)
+                existing_user_addresses.add((user_id, address_id))
                 data = (user_id, address_id)
 
             elif table == "ShoppingCart":
@@ -118,6 +143,7 @@ def insert_data(connection):
     # Commit the transaction
     connection.commit()
     print("Data inserted successfully.")
+
 
 # Execute the functions
 connection = create_connection()
