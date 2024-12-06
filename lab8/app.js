@@ -10,7 +10,7 @@ const db = mysql.createConnection({
   port: process.env.MYSQL_PORT || 3000,
   user: process.env.MYSQL_USER || 'root',
   password: process.env.MYSQL_PASS,
-  database: process.env.DBNAME,
+  database: process.env.DBNAME
 });
 
 db.connect((err) => {
@@ -56,7 +56,7 @@ app.get("/", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
-  
+
   console.log("Received username:", username);
   console.log("Received password:", password);
 
@@ -93,6 +93,5 @@ app.get('/home', (req, res) => {
 });
 
 app.listen(process.env.PORT, () => {
-  // console.log("http://localhost:3000");
   console.log(`Server running at http://localhost:${process.env.PORT}`);
 });

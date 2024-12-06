@@ -1,15 +1,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "test",
+  host: process.env.MYSQL_HOST || 'localhost',
+  port: process.env.MYSQL_PORT || 3000,
+  user: process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASS,
+  database: process.env.DBNAME
 });
 
 db.connect((err) => {
@@ -38,6 +39,7 @@ app.post("/login", (req, res) => {
 
   const query = `SELECT * FROM users WHERE username = ? AND password = ?`;
 
+  // prepared statements
   db.query(query, [username, password], (err, results) => {
     if (err) {
       console.error("Database Error:", err.message);
@@ -63,6 +65,8 @@ app.post("/login", (req, res) => {
 });
 
 // Start Server
-app.listen(3000, () => {
-  console.log("http://localhost:3000");
+app.listen(process.env.PORT, () => {
+  // console.log("http://localhost:3000");
+  console.log(`Server running at http://localhost:${process.env.PORT}`);
 });
+

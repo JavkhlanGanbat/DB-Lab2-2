@@ -1,3 +1,4 @@
+-- Procedures
 DELIMITER //
 CREATE PROCEDURE AddBook(
     IN p_Title VARCHAR(255),
@@ -22,6 +23,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Functions
 DELIMITER //
 CREATE FUNCTION GetOrderTotal(p_OrderID INT)
 RETURNS DECIMAL(10, 2)
@@ -37,6 +39,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Triggers
 DELIMITER //
 CREATE TRIGGER PreventNegativePrice
 BEFORE INSERT ON Books
@@ -49,6 +52,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Events
 DELIMITER //
 CREATE EVENT ArchiveOldOrders
 ON SCHEDULE EVERY 1 MINUTE
@@ -58,3 +62,16 @@ BEGIN
     WHERE OrderDate < CURDATE() - INTERVAL 1 YEAR;
 END //
 DELIMITER ;
+
+
+-- Show all sub functions
+delimiter //
+create procedure showSubFunctions()
+begin
+select specific_name, routine_type from information_schema.routines where routine_schema = 'bookstore'
+union
+SELECT TRIGGER_NAME, "TRIGGER" FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_SCHEMA = 'bookstore'
+union
+SELECT EVENT_NAME, "EVENT" FROM INFORMATION_SCHEMA.EVENTS WHERE EVENT_SCHEMA = 'bookstore';
+end //
+delimiter ;
