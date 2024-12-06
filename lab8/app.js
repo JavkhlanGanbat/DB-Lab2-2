@@ -1,15 +1,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "test",
+  host: process.env.MYSQL_HOST || 'localhost',
+  port: process.env.MYSQL_PORT || 3000,
+  user: process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASS,
+  database: process.env.DBNAME,
 });
 
 db.connect((err) => {
@@ -17,8 +18,28 @@ db.connect((err) => {
     console.error("Database connection error:", err.message);
     process.exit(1);
   }
-  console.log("Connected to database.");
+
+  console.log("Connected to database");
+  console.log(`
+    host: ${process.env.MYSQL_HOST}
+    port: ${process.env.MYSQL_PORT}
+    user: ${process.env.MYSQL_USER}
+    schema: ${process.env.MYSQL_DBNAME}`);
+})
+
+/*
+app.get('/data', (req, res) => {
+  db.query('SELECT * FROM book.Authors', (err, results) => {
+    if (err) {
+      console.error('Error querying the database:', err.message);
+      res.status(500).send('Database query error');
+    } else {
+      res.json(results);
+    }
+  });
 });
+
+*/
 
 app.get("/", (req, res) => {
   res.send(`
@@ -39,9 +60,11 @@ app.post("/login", (req, res) => {
   console.log("Received username:", username);
   console.log("Received password:", password);
 
-  const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
+  const query = `SELECT * FROM book.Users WHERE username = '${username}' AND password = '${password}'`;
+  // const querySimple = `SELECT * FROM book.Users`;
 
   console.log(`Executing query: ${query}`);
+  // console.log(`Executing query: ${querySimple}`);
 
   db.query(query, (err, results) => {
     if (err) {
@@ -51,13 +74,18 @@ app.post("/login", (req, res) => {
     }
 
     if (results.length > 0) {
-      res.send(`<h1>Welcome</h1>`);
+      res.send(`<h1>Welcome, ${username}</h1>`);
     } else {
       res.send("<h1>Invalid credentials.</h1>");
     }
   });
 });
 
-app.listen(3000, () => {
-  console.log("http://localhost:3000");
+app.get('/home', (req, res) => {
+  res.send('Hello, world!');
+});
+
+app.listen(process.env.PORT, () => {
+  // console.log("http://localhost:3000");
+  console.log(`Server running at http://localhost:${process.env.PORT}`);
 });
