@@ -1,6 +1,6 @@
 CALL AddBook('The Two Towers', 3, 'Fantasy', 20.99);
 
-SELECT * FROM books;
+SELECT * FROM Books;
 
 CALL GetCustomerOrders(1);
 
