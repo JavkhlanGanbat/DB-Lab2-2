@@ -34,9 +34,13 @@ CREATE TABLE OrderDetails (
     OrderDetailID INT PRIMARY KEY AUTO_INCREMENT,
     OrderID INT,
     BookID INT,
-    Quantity INT,
-    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE CASCADE,
-    FOREIGN KEY (BookID) REFERENCES Books(BookID) ON DELETE CASCADE
+    Quantity INT
+);
+
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(50),
+    Password VARCHAR(50)
 );
 
 AlTER TABLE Books
