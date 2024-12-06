@@ -57,30 +57,50 @@ app.get("/", (req, res) => {
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
+<<<<<<< HEAD
   console.log("Received username:", username);
   console.log("Received password:", password);
 
   const query = `SELECT * FROM book.Users WHERE username = '${username}' AND password = '${password}'`;
   // const querySimple = `SELECT * FROM book.Users`;
+=======
+  const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
+>>>>>>> bf4a3e25f106bb71399459f5738f964fddfe95a0
 
   console.log(`Executing query: ${query}`);
   // console.log(`Executing query: ${querySimple}`);
 
   db.query(query, (err, results) => {
     if (err) {
-      console.error("SQL Error:", err.message);
-      res.send(`<h1>Database Error: ${err.message}</h1>`);
+      res.send(`
+        <h1>Database Error</h1>
+        <pre>${err.message}</pre>
+        <p>Query Executed: ${query}</p>
+      `);
       return;
     }
 
     if (results.length > 0) {
+<<<<<<< HEAD
       res.send(`<h1>Welcome, ${username}</h1>`);
+=======
+      res.send(`
+        <h1>Welcome</h1>
+        <p>Query Executed: ${query}</p>
+        <pre>${JSON.stringify(results, null, 2)}</pre>
+      `);
+>>>>>>> bf4a3e25f106bb71399459f5738f964fddfe95a0
     } else {
-      res.send("<h1>Invalid credentials.</h1>");
+      res.send(`
+        <h1>Database Error</h1>
+        <pre>Incorrect credentials or syntax error</pre>
+        <p>Query Executed: ${query}</p>
+      `);
     }
   });
 });
 
+<<<<<<< HEAD
 app.get('/home', (req, res) => {
   res.send('Hello, world!');
 });
@@ -88,4 +108,8 @@ app.get('/home', (req, res) => {
 app.listen(process.env.PORT, () => {
   // console.log("http://localhost:3000");
   console.log(`Server running at http://localhost:${process.env.PORT}`);
+=======
+app.listen(3000, () => {
+  console.log("Server running at http://localhost:3000");
+>>>>>>> bf4a3e25f106bb71399459f5738f964fddfe95a0
 });
