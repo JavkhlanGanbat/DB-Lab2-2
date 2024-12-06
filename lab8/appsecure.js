@@ -36,16 +36,15 @@ app.get("/", (req, res) => {
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
-  const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
+  const query = `SELECT * FROM users WHERE username = ? AND password = ?`;
 
-  console.log(`Executing query: ${query}`);
-
-  db.query(query, (err, results) => {
+  db.query(query, [username, password], (err, results) => {
     if (err) {
+      console.error("Database Error:", err.message);
+
       res.send(`
-        <h1>Database Error</h1>
-        <pre>${err.message}</pre>
-        <p>Query Executed: ${query}</p>
+        <h1>Error</h1>
+        <p>Please try again later.</p>
       `);
       return;
     }
@@ -53,19 +52,17 @@ app.post("/login", (req, res) => {
     if (results.length > 0) {
       res.send(`
         <h1>Welcome</h1>
-        <p>Query Executed: ${query}</p>
-        <pre>${JSON.stringify(results, null, 2)}</pre>
+        <p>Welcome</p>
       `);
     } else {
       res.send(`
-        <h1>Database Error</h1>
-        <pre>Incorrect credentials or syntax error</pre>
-        <p>Query Executed: ${query}</p>
+        <h1>Username or password wrong</h1>
       `);
     }
   });
 });
 
+// Start Server
 app.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
+  console.log("http://localhost:3000");
 });
