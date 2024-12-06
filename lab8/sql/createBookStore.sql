@@ -27,8 +27,7 @@ CREATE TABLE Customers (
 CREATE TABLE Orders (
     OrderID INT PRIMARY KEY AUTO_INCREMENT,
     CustomerID INT,
-    OrderDate DATE,
-    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID) ON DELETE CASCADE
+    OrderDate DATE
 );
 
 CREATE TABLE OrderDetails (
@@ -39,3 +38,23 @@ CREATE TABLE OrderDetails (
     FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE CASCADE,
     FOREIGN KEY (BookID) REFERENCES Books(BookID) ON DELETE CASCADE
 );
+
+AlTER TABLE Books
+    ADD CONSTRAINT fk_books_authors
+    FOREIGN KEY (AuthorID) REFERENCES Authors(AuthorID)
+    ON DELETE CASCADE;
+
+AlTER TABLE Orders
+    ADD CONSTRAINT fk_orders_customers
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+    ON DELETE CASCADE;
+
+ALTER TABLE OrderDetails
+    ADD CONSTRAINT fk_orderdetails_books
+    FOREIGN KEY (BookID) REFERENCES Books(BookID)
+    ON DELETE CASCADE;
+
+ALTER TABLE OrderDetails
+    ADD CONSTRAINT fk_orderdetails_orders
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+    ON DELETE CASCADE;
