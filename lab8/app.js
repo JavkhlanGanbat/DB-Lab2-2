@@ -60,7 +60,7 @@ app.post("/login", (req, res) => {
   console.log("Received username:", username);
   console.log("Received password:", password);
 
-  const query = `SELECT * FROM book.Users WHERE username = '${username}' AND password = '${password}'`;
+  const query = `SELECT * FROM test.Users WHERE username = '${username}' AND password = '${password}'`;
   // const querySimple = `SELECT * FROM book.Users`;
 
   console.log(`Executing query: ${query}`);
