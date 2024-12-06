@@ -14,7 +14,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE GetCustomerOrders(IN p_CustomerID INT)
 BEGIN
-    SELECT o.OrderID, o.OrderDate, b.Title, od.Quantity 
+    SELECT o.OrderID, o.OrderDate, b.Title, od.Quantity, o.CustomerID 
     FROM Orders o
     JOIN OrderDetails od ON o.OrderID = od.OrderID
     JOIN Books b ON od.BookID = b.BookID
