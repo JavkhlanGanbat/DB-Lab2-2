@@ -61,7 +61,12 @@ VALUES
     ('Jane', 'Smith', 'jane.smith@example.com'),
     ('Mike', 'Johnson', 'mike.johnson@example.com'),
     ('Sarah', 'Brown', 'sarah.brown@example.com'),
-    ('David', 'Taylor', 'david.taylor@example.com');
+    ('David', 'Taylor', 'david.taylor@example.com'),
+    ('Emily', 'Clark', 'emily.clark@example.com'),
+    ('Chris', 'Evans', 'chris.evans@example.com'),
+    ('Olivia', 'Wilson', 'olivia.wilson@example.com'),
+    ('Liam', 'Harris', 'liam.harris@example.com'),
+    ('Sophia', 'Martinez', 'sophia.martinez@example.com');
 
 -- Orders
 INSERT INTO
@@ -92,13 +97,13 @@ VALUES
     (4, 8, 2),
     (5, 9, 1),
     (5, 10, 3),
-    (1, 2, 3), -- Order 1: 3 copies of Book 2
-    (5, 8, 1), -- Order 5: 1 copy of Book 8
-    (10, 3, 5), -- Order 10: 5 copies of Book 3
-    (15, 7, 2), -- Order 15: 2 copies of Book 7
-    (20, 1, 4), -- Order 20: 4 copies of Book 1
-    (25, 9, 6), -- Order 25: 6 copies of Book 9
-    (50, 10, 10), -- Order 50: 10 copies of Book 10
-    (75, 4, 8), -- Order 75: 8 copies of Book 4
-    (85, 6, 12), -- Order 85: 12 copies of Book 6
-    (100, 5, 7);
+    (1, 2, 3),   -- Adjusted to Order 1
+    (5, 8, 1),   -- Adjusted to Order 5
+    (6, 3, 5),   -- Adjusted to Order 6
+    (7, 7, 2),   -- Adjusted to Order 7
+    (8, 1, 4),   -- Adjusted to Order 8
+    (9, 9, 6),   -- Adjusted to Order 9
+    (10, 10, 10),-- Adjusted to Order 10
+    (3, 4, 8),   -- Adjusted to Order 3
+    (4, 6, 12),  -- Adjusted to Order 4
+    (5, 5, 7);
